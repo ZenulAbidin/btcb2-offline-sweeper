@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="title desc">
+<title id="title">Which file is which?</title><desc id="desc">Public inventory identifies addresses. Manifest identifies unspent outputs. Keys contain private spending secrets and stay offline. Signed hex authorizes the exact transaction.</desc>
+<rect width="1200" height="340" rx="20" fill="#f3f6fa"/>
+<g font-family="Arial, sans-serif"><text x="35" y="48" font-size="24" font-weight="700" fill="#14283e">These files are not interchangeable</text>
+<g stroke="#ccd5df" fill="white"><rect x="30" y="78" width="270" height="224" rx="12"/><rect x="320" y="78" width="270" height="224" rx="12"/><rect x="610" y="78" width="270" height="224" rx="12"/><rect x="900" y="78" width="270" height="224" rx="12"/></g>
+<g font-size="16" font-weight="700" fill="#14283e"><text x="48" y="118">public_inventory.json</text><text x="338" y="118">manifest.json</text><text x="628" y="118">keys.txt</text><text x="918" y="118">tx_0001.hex</text></g>
+<g font-size="17" fill="#42566d"><text x="48" y="158">Addresses and paths</text><text x="48" y="188">Where to look</text><text x="338" y="158">Outpoints and parents</text><text x="338" y="188">What to spend</text><text x="628" y="158">Compressed private keys</text><text x="628" y="188">Secrets used to sign</text><text x="918" y="158">Signed transaction</text><text x="918" y="188">What to broadcast</text></g>
+<g font-size="14" font-weight="700"><text x="48" y="266" fill="#254f85">PUBLIC, PRIVACY-SENSITIVE</text><text x="338" y="266" fill="#254f85">PUBLIC TRANSACTION DATA</text><text x="628" y="266" fill="#a43232">PRIVATE · KEEP OFFLINE</text><text x="918" y="266" fill="#8b5711">SPENDING AUTHORIZATION</text></g>
+</g></svg>

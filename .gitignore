@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+keys*.txt
+*private_key*
+*.wallet
+wallets/
+public_inventory.json
+manifest.json
+verification.json
+fork_data/
+plan_review*/
+signed_review*/
+*.hex
+.env

@@ -1,0 +1,19 @@
+{
+  "format": "offline-p2wpkh-sweep/v2",
+  "signing_profile": "knots-unified-p2wpkh-0x21/v2",
+  "snapshot": {
+    "height": 961640,
+    "block_hash": "REPLACE_WITH_ACTUAL_CHECKED_FORK_SNAPSHOT_HASH"
+  },
+  "transactions": {
+    "REPLACE_WITH_PARENT_TXID": "REPLACE_WITH_FULL_RAW_PARENT_TRANSACTION_HEX"
+  },
+  "utxos": [
+    {
+      "txid": "REPLACE_WITH_PARENT_TXID",
+      "vout": 0,
+      "value_sats": 100000,
+      "script_pubkey": "0014REPLACE_WITH_40_HEX_CHARACTERS"
+    }
+  ]
+}

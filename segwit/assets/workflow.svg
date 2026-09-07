@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+<title id="title">Public data online, private keys offline</title><desc id="desc">Export public addresses offline. Build a fork manifest online. Review and sign offline. Return only signed transaction hex to the online computer for broadcast.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="none" stroke="#607486" stroke-width="1.4"/></marker></defs>
+<rect width="1200" height="440" rx="20" fill="#f3f6fa"/>
+<g font-family="Arial, sans-serif"><text x="40" y="48" font-size="24" font-weight="700" fill="#14283e">A four-step transfer, with keys kept offline</text>
+<rect x="35" y="80" width="550" height="320" rx="16" fill="#e6eef9"/><rect x="615" y="80" width="550" height="320" rx="16" fill="#e0f2eb"/>
+<text x="60" y="118" font-size="18" font-weight="700" fill="#254f85">OFFLINE · your Electrum wallet</text><text x="640" y="118" font-size="18" font-weight="700" fill="#166346">ONLINE · public fork data</text>
+<g fill="white" stroke="#c0cddd"><rect x="60" y="144" width="480" height="78" rx="10"/><rect x="660" y="144" width="480" height="78" rx="10"/><rect x="60" y="292" width="480" height="78" rx="10"/><rect x="660" y="292" width="480" height="78" rx="10"/></g>
+<g font-size="19" font-weight="700" fill="#14283e"><text x="80" y="175">1. Export public addresses</text><text x="680" y="175">2. Find UTXOs; build manifest</text><text x="80" y="323">3. Review, export keys, sign</text><text x="680" y="323">4. Check and broadcast</text></g>
+<g font-size="15" fill="#42566d"><text x="80" y="201">Public inventory only; no seed or private keys</text><text x="680" y="201">Fork outpoints + raw parent transactions</text><text x="80" y="349">Use the actual unified signature algorithm</text><text x="680" y="349">Use the BLAKE2b network; await receipt</text></g>
+<g stroke="#607486" stroke-width="2" fill="none" marker-end="url(#arrow)"><path d="M545 184 H650"/><path d="M900 228 V256 H300 V284"/><path d="M545 332 H650"/></g>
+<g font-size="14" fill="#42566d"><text x="482" y="246">Public manifest goes offline</text><text x="546" y="309">Signed hex</text></g>
+</g></svg>
