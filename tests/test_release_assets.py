@@ -117,7 +117,9 @@ class ReleaseAssetsTests(unittest.TestCase):
             release_assets.main()
             remote.assert_called_once_with("v0.1.0", "a" * 40)
             arguments = publish.call_args.args[0]
-            self.assertEqual(arguments[4:10], [str(self.folder / name) for name in asset_names(self.version)])
+            # Windows runners may provide TEMP using its 8.3 short-path spelling.
+            self.assertEqual(arguments[4:10], [str(self.folder.resolve() / name)
+                                              for name in asset_names(self.version)])
             self.assertNotIn("*", " ".join(arguments))
 
     def test_license_collection_rejects_stale_unreviewed_file(self):
