@@ -1,8 +1,8 @@
-# Windows x64, CPython 3.12; resolved 2026-09-08 from PyPI.
+# Windows x64, CPython 3.13.15 (conventional build); resolved 2026-09-08 from PyPI.
 # Install with: python -m pip install --require-hashes --only-binary=:all: -r requirements-windows.lock
 altgraph==0.17.5 --hash=sha256:f3a22400bce1b0c701683820ac4f3b159cd301acab067c51c653e06961600597
-cffi==2.1.1 --hash=sha256:f53e442b08449d42821fa4a4fba000095af9f62742a500f978a9f557ec44339a
-coincurve==21.0.0 --hash=sha256:5dd7b66b83b143f3ad3861a68fc0279167a0bae44fe3931547400b7a200e90b1
+cffi==2.1.1 --hash=sha256:1aa5645c30469b09530c4ebca77ebf8f17618293c58f8549cb1a543a50236e7d
+coincurve==21.0.0 --hash=sha256:54d9500c56d5499375e579c3917472ffcf804c3584dd79052a79974280985c74
 cryptography==50.0.1 --hash=sha256:aed8db4f6d71c51efb89530e12d9464e7bf2923d46c3205dc794a2a93f8c0648
 mnemonic==0.21 --hash=sha256:72dc9de16ec5ef47287237b9b6943da11647a03fe7cf1f139fc3d7c4a7439288
 packaging==26.3 --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c

@@ -18,7 +18,8 @@ class ReleaseAssetsTests(unittest.TestCase):
         self.version = "0.1.0"
         for name in asset_names(self.version):
             (self.folder / name).write_bytes(b"synthetic artifact")
-        self.info = {"version": self.version, "source_commit": "a" * 40, "source_tree_dirty": False}
+        self.info = {"version": self.version, "source_commit": "a" * 40,
+                     "source_tree_dirty": False, "python": release_assets.RELEASE_PYTHON}
         self.save_info()
 
     def tearDown(self):
@@ -94,6 +95,38 @@ class ReleaseAssetsTests(unittest.TestCase):
             verify_remote_tag("v0.1.0", "a" * 40)
             self.assertEqual(query.call_args_list[1].args[0][-1],
                              "repos/{owner}/{repo}/git/tags/" + "b" * 40)
+
+    def test_release_rejects_missing_or_outdated_interpreter_metadata(self):
+        for version in (None, "3.12.10", "3.12.14", "3.13.14"):
+            with self.subTest(version=version):
+                self.info["python"] = version
+                self.save_info()
+                with self.assertRaisesRegex(ValueError, "require Python 3.13.15"):
+                    verify_release(self.folder, self.version, require_clean=True)
+
+    def test_build_requires_exact_conventional_cpython_windows_x64(self):
+        from scripts import build_release
+
+        cases = [((3, 13, 15), 0, "AMD64", "CPython", False),
+                 ((3, 12, 10), 0, "AMD64", "CPython", True),
+                 ((3, 13, 14), 0, "AMD64", "CPython", True),
+                 ((3, 13, 15), 1, "AMD64", "CPython", True),
+                 ((3, 13, 15), 0, "ARM64", "CPython", True),
+                 ((3, 13, 15), 0, "AMD64", "PyPy", True)]
+        for version, free_threaded, machine, implementation, reject in cases:
+            with self.subTest(version=version, free_threaded=free_threaded,
+                              machine=machine, implementation=implementation), \
+                    patch.object(build_release.sys, "platform", "win32"), \
+                    patch.object(build_release.sys, "version_info", version), \
+                    patch.object(build_release.platform, "architecture", return_value=("64bit", "")), \
+                    patch.object(build_release.platform, "machine", return_value=machine), \
+                    patch.object(build_release.platform, "python_implementation", return_value=implementation), \
+                    patch.object(build_release.sysconfig, "get_config_var", return_value=free_threaded):
+                if reject:
+                    with self.assertRaises(SystemExit):
+                        build_release.require_build_runtime()
+                else:
+                    build_release.require_build_runtime()
 
     def test_publish_rejects_extra_before_remote_access_and_passes_exact_argv(self):
         argv = ["release_assets.py", "--directory", str(self.folder), "--publish", "v0.1.0"]

@@ -34,7 +34,7 @@ The default online explorer is `mempool.guide`; compatible HTTPS Esplora endpoin
 
 ## Run from Python or build your own EXEs
 
-For source users, install Python 3.12 and run:
+For source users, install a maintained Python version (3.13.15 recommended; the code supports 3.12+) and run:
 
 ```sh
 python -m pip install -r requirements.txt

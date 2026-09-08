@@ -15,14 +15,15 @@ import platform
 import shutil
 import subprocess
 import sys
+import sysconfig
 import tempfile
 import tomllib
 import zipfile
 
 try:
-    from .release_assets import reject_extra_files, verify_release
+    from .release_assets import RELEASE_PYTHON, reject_extra_files, verify_release
 except ImportError:  # Direct invocation from the repository root.
-    from release_assets import reject_extra_files, verify_release
+    from release_assets import RELEASE_PYTHON, reject_extra_files, verify_release
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
@@ -81,11 +82,18 @@ def audit_archive(executable: Path, role: str) -> None:
         raise RuntimeError(f"Unexpected modules in {role} executable: {found}")
 
 
+def require_build_runtime() -> None:
+    if (sys.platform != "win32" or platform.architecture()[0] != "64bit"
+            or platform.machine().upper() not in {"AMD64", "X86_64"}):
+        raise SystemExit(f"Build on Windows x64 with conventional CPython {RELEASE_PYTHON}.")
+    if (sys.version_info[:3] != tuple(map(int, RELEASE_PYTHON.split(".")))
+            or platform.python_implementation() != "CPython"
+            or sysconfig.get_config_var("Py_GIL_DISABLED")):
+        raise SystemExit(f"Release builds require conventional CPython {RELEASE_PYTHON} and requirements-windows.lock.")
+
+
 def _build_with_licenses(notices: Path) -> None:
-    if sys.platform != "win32" or platform.architecture()[0] != "64bit":
-        raise SystemExit("Build on 64-bit Windows with 64-bit Python 3.12.")
-    if sys.version_info[:2] != (3, 12):
-        raise SystemExit("Release builds require Python 3.12 and requirements-windows.lock.")
+    require_build_runtime()
     with (ROOT / "pyproject.toml").open("rb") as handle:
         version = tomllib.load(handle)["project"]["version"]
     sys.path.insert(0, str(ROOT))

@@ -11,6 +11,7 @@ import subprocess
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
+RELEASE_PYTHON = "3.13.15"
 
 
 def current_version() -> str:
@@ -64,6 +65,8 @@ def verify_release(directory: Path, version: str, *, require_clean=False,
     info = json.loads((directory / "build-info.json").read_text(encoding="utf-8"))
     if info.get("version") != version:
         raise ValueError("Build information does not match this release version.")
+    if info.get("python") != RELEASE_PYTHON:
+        raise ValueError(f"Release artifacts require Python {RELEASE_PYTHON}.")
     if require_clean and info.get("source_tree_dirty") is not False:
         raise ValueError("Publishing requires a build from a clean source checkout.")
     if expected_commit is not None and info.get("source_commit") != expected_commit:

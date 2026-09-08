@@ -1,13 +1,13 @@
 # Building and releasing Windows executables
 
-Build on 64-bit Windows with CPython 3.12. PyInstaller bundles the interpreter and dependencies; users of the EXEs do not need Python. A Windows EXE must be built on Windows. Build in a clean virtual environment so unrelated local packages do not enter the archive.
+Build on Windows x64 with the conventional (GIL-enabled) [CPython 3.13.15 release](https://www.python.org/downloads/release/python-31315/). The build checks this exact patch version and rejects other interpreters. PyInstaller bundles the interpreter and dependencies; users of the EXEs do not need Python. A Windows EXE must be built on Windows. Build in a clean virtual environment so unrelated local packages do not enter the archive.
 
 ## Local build
 
-From the repository root in PowerShell:
+Install the conventional Windows x64 Python 3.13.15 installer first. From the repository root in PowerShell:
 
 ```powershell
-py -3.12 -m venv .venv-build
+py -3.13 -m venv .venv-build
 .\scripts\build_windows.ps1 -Python .\.venv-build\Scripts\python.exe
 ```
 
@@ -30,7 +30,7 @@ The build refuses unexpected files in `dist/`, including ZIPs from an older vers
 
 ## Updating dependencies
 
-`requirements.txt` pins direct runtime dependencies for source users; `requirements-build.txt` adds packaging tools. The Windows lock additionally pins every transitive wheel and its SHA-256 hash for CPython 3.12 x64. Update pins deliberately, resolve in a fresh Windows environment, and obtain hashes from the corresponding PyPI wheel. Review the resulting lock change and rerun the entire build. The hash file is intentionally platform-specific; use `requirements.txt` for Linux source tests.
+`requirements.txt` pins direct runtime dependencies for source users; `requirements-build.txt` adds packaging tools. The Windows lock additionally pins every transitive wheel and its SHA-256 hash for conventional CPython 3.13.15 x64. Update the exact interpreter baseline and package pins deliberately, resolve in a fresh Windows environment, and obtain hashes from the corresponding PyPI wheel. Review the resulting lock change and rerun the entire build. The hash file is intentionally platform-specific; use `requirements.txt` for Linux source tests.
 
 PyInstaller's [one-file packaging options](https://pyinstaller.org/en/stable/usage.html) are configured in `scripts/build_release.py`. Source signer modules are imported explicitly into each build; only the online app includes explorer builders. Mnemonic word lists and required native libraries are bundled with the offline executable. Upstream, Python and dependency licenses are included.
 
@@ -46,7 +46,7 @@ To publish:
 
 Release publishing uses the workflow's scoped GitHub token. All third-party Actions are pinned to full commit hashes. Only the final release job has `contents: write`; build jobs use read-only repository permissions. If a release already exists, publishing fails rather than silently replacing it.
 
-Version pins and metadata make the build inspectable. Byte-for-byte reproducibility is not claimed: Python patch versions, Windows images, PE timestamps and archive metadata can differ. The current release process does not apply an Authenticode signature.
+Version pins and metadata make the build inspectable. Byte-for-byte reproducibility is not claimed: Windows images, PE timestamps and archive metadata can differ. The current release process does not apply an Authenticode signature.
 
 ## Refreshing the original script downloads
 

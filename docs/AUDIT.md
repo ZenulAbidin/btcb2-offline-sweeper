@@ -25,6 +25,7 @@ All findings below were addressed before the release build. The evidence describ
 | Stale license staging | Unrelated files could enter both EXEs and ZIPs despite a clean release directory. | Build licenses in a fresh temporary directory and reject nonempty staging. The pre-fix sentinel reproduction is rejected after the fix. |
 | Existing release tag points to different source | Correctly hashed binaries could be attached to the wrong source version. | Require clean source provenance and resolve the target GitHub tag, including annotated tags, to the build's commit. A mismatched target prevents the release command. |
 | Known advisory in a build dependency | The initial setuptools pin had a published source-distribution exclusion vulnerability. | Upgrade to hash-pinned setuptools 83.0.0. The installed fix and Unicode exclusion behavior were checked. This was not a demonstrated exploit of the Windows EXEs; see the [setuptools advisory](https://github.com/pypa/setuptools/security/advisories/GHSA-h35f-9h28-mq5c). |
+| Outdated bundled interpreter selected by CI | The Python 3.12 Windows binary selected by CI was 3.12.10, predating later upstream security fixes. A package-only advisory scan did not cover this runtime. | Withhold those builds; pin release builds to the official Python 3.13.15 Windows x64 runtime, regenerate the wheel hashes for that interpreter, and rerun the actual executable checks. See the [Python 3.13.15 release](https://www.python.org/downloads/release/python-31315/) and [Python 3.12 security-only release policy](https://www.python.org/downloads/release/python-31214/). |
 | Incomplete final transaction review | Users could not compare signed transaction IDs with later receipts. | Display signed IDs and distinguish unsigned legacy IDs, which change on signing. Review dialogs were checked at 80×25, 80×30 and 120×30 terminal sizes. |
 
 ## Audit of the audit
@@ -33,16 +34,20 @@ Separate agents reviewed fixes outside their implementation ownership. Wallet wo
 
 The second review found the stale license staging and tag provenance issues after the first release-directory fix. It also found a defect in the crash test: a Windows virtual-environment launcher could be killed while its child still owned the lock. The corrected test launches the base interpreter and asserts that the reported lock-holder PID equals the process being killed.
 
+Reviewing the actual CI build metadata exposed another coverage gap: the initial PyPI advisory check omitted the bundled Python runtime. The older CI interpreter was rejected before tagging; release builds now require an exact current Windows runtime version. CI also caught a workflow YAML parsing error and a Windows short-path assumption in a test; both were corrected before release.
+
+No application exploit was demonstrated in the runtime review. The reviewed upstream HTTP allocation issue used an unbounded `HTTPResponse.read()`, while this app supplies a size bound. A later SSL fix concerned a native allocation-error path; no app-specific remote exploit was established. Python 3.13.15 also limits repeated interim HTTP responses and chunked trailers, complementing the app's response deadline. See the [Python 3.12.13 security changes](https://www.python.org/downloads/release/python-31213/) and [Python 3.13.15 HTTP changes](https://raw.githubusercontent.com/python/cpython/v3.13.15/Misc/NEWS.d/3.13.15.rst).
+
 Selected regressions were tested against original implementations or isolated restorations of the original behavior: encrypted-key prefix detection, stale confirmation handling, eager scan scheduling and slow-response handling. They failed on the original behavior and passed on the fixes. This checks that those tests detect the stated bugs; it is not exhaustive mutation testing.
 
 ## Validation evidence
 
-The final local Windows source run completed 107 tests: 106 passed and one POSIX-permissions test was skipped. Both role self-tests also passed. GitHub Actions records the separate Linux/Windows release checks.
+The final local Windows source run completed 109 tests: 108 passed and one POSIX-permissions test was skipped. Both role self-tests also passed. GitHub Actions records the separate Linux/Windows release checks.
 
 - Both original signer suites and the complete application suite run through `python scripts/run_tests.py`. They cover published derivation/digest vectors, signature and transaction validation, replay rejection, malformed files, secret-free public transfers, confirmation defaults and broadcast recovery.
 - Synthetic full workflows cover BIP39 legacy and SegWit accounts, encrypted Electrum fixtures and compressed WIF imports, through inventory, mocked scan, plan, signing, exported bundle, mocked broadcast and receipt reopening. External network access is blocked in these round-trip tests.
 - Electrum encryption fixtures are synthetic; encryption logic was compared with pinned upstream source, and address derivation with published vectors. No upstream BIE1 ciphertext fixture or live Electrum-created wallet was tested, and this is not a claim that every Electrum wallet configuration works.
-- One read-only request through the actual HTTPS transport confirmed the configured explorer's required fork checkpoint. No wallet addresses or transactions were submitted in that check.
+- Read-only requests through the actual HTTPS transport, including under the official Python 3.13.15 Windows runtime, confirmed the configured explorer's required fork checkpoint. No wallet addresses or transactions were submitted in those checks.
 - The 14 pinned Windows dependency versions were checked against their PyPI JSON advisory data after the setuptools upgrade; no published advisories were returned at review time. This is a dated known-advisory check, not a source audit of every dependency or embedded native library.
 - Release builds run self-tests inside both actual one-file Windows EXEs, inspect frozen module separation and verify the exact release inventory and checksums. Build metadata records the source commit and clean-tree status. CI reruns tests on Linux and Windows before publishing a tagged prerelease.
 
