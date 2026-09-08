@@ -295,8 +295,15 @@ def load_keys(path: Path, prefix: int) -> dict[bytes, Key]:
         text = raw.decode("ascii")
     except UnicodeError:
         raise SweepError("Key file must be ASCII compressed WIFs, one per line.") from None
+    return parse_key_lines(text.splitlines(), prefix)
+
+
+def parse_key_lines(lines, prefix: int) -> dict[bytes, Key]:
+    """Parse local in-memory WIFs; shared by the original CLI and offline TUI."""
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
     keys: dict[bytes, Key] = {}
-    for line_number, line in enumerate(text.splitlines(), 1):
+    for line_number, line in enumerate(lines, 1):
         wif = line.strip()
         if not wif or wif.startswith("#"):
             continue
@@ -641,7 +648,7 @@ def plan_hash(plan: dict[str, Any]) -> str:
     return hashlib.sha256(json.dumps(plan, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, key_provider=None) -> int:
     disable_core_dumps()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
@@ -695,10 +702,10 @@ def main(argv: list[str] | None = None) -> int:
         if not args.plan_only:
             if provenance["snapshot"]["height"] < ACTIVATION_HEIGHT:
                 raise SweepError("Signing requires a fork snapshot at/after mainnet unified activation height 961640.")
-            if args.keys_file is None or args.reviewed_plan is None:
+            if (args.keys_file is None and key_provider is None) or args.reviewed_plan is None:
                 raise SweepError("Signing requires --keys-file and --reviewed-plan; planning needs no keys.")
             check_reviewed_plan(args.reviewed_plan, review_plan)
-            keys = load_keys(args.keys_file, 128)
+            keys = key_provider() if key_provider is not None else load_keys(args.keys_file, 128)
             if any(c.script not in keys for c in sweeps):
                 raise SweepError("Key file does not cover every source input.")
         files: dict[str, str] = {}

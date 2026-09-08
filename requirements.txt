@@ -1,1 +1,5 @@
-cryptography
+# Runtime dependencies. Release builds use the complete hash-locked Windows file.
+cryptography==50.0.1
+prompt-toolkit==3.0.53
+coincurve==21.0.0
+mnemonic==0.21
